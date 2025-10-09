@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from models.user import UserLogin, UserCreate, UserResponse, Token
-from services.user_service import UserService
-from repositories.user_repository import UserRepository
-from config.db import get_database
-from utils.auth import verify_token, get_credentials_exception
+from ..models.user import UserLogin, UserCreate, UserResponse, Token
+from ..services.user_service import UserService
+from ..repositories.user_repository import UserRepository
+from ..config.db import get_database
+from ..utils.auth import verify_token, get_credentials_exception
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 security = HTTPBearer()

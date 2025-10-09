@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, status
-from services.user_service import UserService
-from repositories.user_repository import UserRepository
-from config.db import get_database
+from ..services.user_service import UserService
+from ..repositories.user_repository import UserRepository
+from ..config.db import get_database
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
 

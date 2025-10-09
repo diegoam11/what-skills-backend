@@ -1,11 +1,11 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import List
-from models.user import EmployabilityData, EmployabilityScore, Recommendation
-from services.user_service import UserService
-from repositories.user_repository import UserRepository
-from config.db import get_database
-from utils.auth import verify_token, get_credentials_exception
+from ..models.user import EmployabilityData, EmployabilityScore, Recommendation
+from ..services.user_service import UserService
+from ..repositories.user_repository import UserRepository
+from ..config.db import get_database
+from ..utils.auth import verify_token, get_credentials_exception
 
 router = APIRouter(prefix="/employability", tags=["Employability"])
 security = HTTPBearer()

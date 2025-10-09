@@ -1,13 +1,13 @@
 from typing import Optional, List
 from fastapi import HTTPException, status
-from models.user import (
+from ..models.user import (
     UserCreate, UserLogin, UserResponse, Token, 
     EmployabilityData, EmployabilityScore, Recommendation
 )
-from repositories.user_repository import UserRepository
-from services.employability_service import EmployabilityCalculator, generate_sample_employability_data
-from services.recommendation_service import RecommendationService
-from utils.auth import verify_password, create_access_token, get_password_hash
+from ..repositories.user_repository import UserRepository
+from .employability_service import EmployabilityCalculator, generate_sample_employability_data
+from .recommendation_service import RecommendationService
+from ..utils.auth import verify_password, create_access_token, get_password_hash
 from datetime import timedelta
 
 

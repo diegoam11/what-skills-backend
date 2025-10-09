@@ -1,5 +1,5 @@
 from typing import List
-from models.user import Recommendation, EmployabilityScore, EmployabilityData
+from ..models.user import Recommendation, EmployabilityScore, EmployabilityData
 from datetime import datetime
 
 
