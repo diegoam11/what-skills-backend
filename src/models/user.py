@@ -1,10 +1,14 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Any
 from pydantic import BaseModel, EmailStr, Field
 from bson import ObjectId
 
 
 class PyObjectId(ObjectId):
+    @classmethod
+    def __get_pydantic_json_schema__(cls, _source_type: Any, _handler) -> dict:
+        return {"type": "string"}
+
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
@@ -14,10 +18,6 @@ class PyObjectId(ObjectId):
         if not ObjectId.is_valid(v):
             raise ValueError("Invalid objectid")
         return ObjectId(v)
-
-    @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type="string")
 
 
 # Authentication Models
