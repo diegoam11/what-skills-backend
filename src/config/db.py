@@ -1,28 +1,34 @@
+from motor.motor_asyncio import AsyncIOMotorClient
+from typing import Optional
 import os
-from functools import lru_cache
-
 from dotenv import load_dotenv
-from pymongo import MongoClient
 
 load_dotenv()
 
-MONGODB_URI = os.getenv("MONGODB_URI")
+class Database:
+    client: Optional[AsyncIOMotorClient] = None
+    database = None
 
+db = Database()
 
-class MongoConnection:
-    def __init__(self, connection_string=MONGODB_URI):
-        self.client = MongoClient(connection_string)
+async def get_database():
+    return db.database
 
-    def get_database(self, db_name: str):
-        return self.client[db_name]
+async def connect_to_mongo():
+    """Create database connection"""
+    mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017/whatskills")
+    db.client = AsyncIOMotorClient(mongo_url)
+    db.database = db.client.whatskills
+    
+    # Test connection
+    try:
+        await db.client.admin.command('ping')
+        print("✅ Connected to MongoDB")
+    except Exception as e:
+        print(f"❌ Error connecting to MongoDB: {e}")
 
-    def get_collection(self, db_name: str, collection_name: str):
-        return self.client[db_name][collection_name]
-
-    def close(self):
-        self.client.close()
-
-
-@lru_cache()
-def get_mongo_connection() -> MongoConnection:
-    return MongoConnection()
+async def close_mongo_connection():
+    """Close database connection"""
+    if db.client:
+        db.client.close()
+        print("❌ Disconnected from MongoDB")
