@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from config.db import connect_to_mongo, close_mongo_connection
-from controllers.auth_controller import router as auth_router
-from controllers.user_controller import router as user_router
-from controllers.employability_controller import router as employability_router
-from controllers.reports_controller import router as reports_router
+from .config.db import connect_to_mongo, close_mongo_connection
+from .controllers.auth_controller import router as auth_router
+from .controllers.user_controller import router as user_router
+from .controllers.employability_controller import router as employability_router
+from .controllers.reports_controller import router as reports_router
 
 # Create FastAPI app
 app = FastAPI(
