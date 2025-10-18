@@ -25,4 +25,5 @@ class MongoConnection:
 
 @lru_cache()
 def get_mongo_connection() -> MongoConnection:
+    print("[MONGODB] Establishing connection...")
     return MongoConnection()

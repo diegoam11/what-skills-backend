@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from controllers.user_controller import router as user_router
+from src.controllers.user_controller import router as user_router
 
 app = FastAPI()
 

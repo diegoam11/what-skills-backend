@@ -1,5 +1,5 @@
-from models.user import UserResponse
-from repositories.user_repository import UserRepository
+from src.models.user import UserCreate, UserResponse
+from src.repositories.user_repository import UserRepository
 
 
 class UserService:
@@ -8,3 +8,6 @@ class UserService:
 
     def find_users(self) -> list[UserResponse]:
         return self.user_repo.find_users()
+
+    def create_user(self, user: UserCreate) -> UserResponse:
+        return self.user_repo.create_user(user)

@@ -2,14 +2,14 @@ from pydantic import BaseModel, EmailStr, Field
 
 
 class UserCreate(BaseModel):
-    name: str
     email: EmailStr
     password: str
+    career: str
+    position: str
 
 
 class UserResponse(BaseModel):
     id: str = Field(..., alias="_id")
-    name: str
     email: EmailStr
 
     class Config:
