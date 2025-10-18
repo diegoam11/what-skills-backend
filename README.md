@@ -6,3 +6,7 @@ isort .
 
 # Formatear el código
 black .
+
+## Ejecutar programa
+```bash
+uvicorn src.main:app --reload
