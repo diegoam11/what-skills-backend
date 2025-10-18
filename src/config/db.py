@@ -27,8 +27,14 @@ async def connect_to_mongo():
     except Exception as e:
         print(f"❌ Error connecting to MongoDB: {e}")
 
-async def close_mongo_connection():
-    """Close database connection"""
-    if db.client:
-        db.client.close()
-        print("❌ Disconnected from MongoDB")
+    def get_collection(self, db_name: str, collection_name: str):
+        return self.client[db_name][collection_name]
+
+    def close(self):
+        self.client.close()
+
+
+@lru_cache()
+def get_mongo_connection() -> MongoConnection:
+    print("[MONGODB] Establishing connection...")
+    return MongoConnection()

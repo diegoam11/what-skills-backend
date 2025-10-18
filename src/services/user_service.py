@@ -1,14 +1,5 @@
-from typing import Optional, List
-from fastapi import HTTPException, status
-from ..models.user import (
-    UserCreate, UserLogin, UserResponse, Token, 
-    EmployabilityData, EmployabilityScore, Recommendation
-)
-from ..repositories.user_repository import UserRepository
-from .employability_service import EmployabilityCalculator, generate_sample_employability_data
-from .recommendation_service import RecommendationService
-from ..utils.auth import verify_password, create_access_token, get_password_hash
-from datetime import timedelta
+from src.models.user import UserCreate, UserResponse
+from src.repositories.user_repository import UserRepository
 
 
 class UserService:
@@ -160,3 +151,6 @@ class UserService:
 
     def find_users(self) -> list[UserResponse]:
         return self.user_repo.find_users()
+
+    def create_user(self, user: UserCreate) -> UserResponse:
+        return self.user_repo.create_user(user)

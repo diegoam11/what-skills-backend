@@ -6,12 +6,7 @@ from .controllers.user_controller import router as user_router
 from .controllers.employability_controller import router as employability_router
 from .controllers.reports_controller import router as reports_router
 
-# Create FastAPI app
-app = FastAPI(
-    title="WhatSkills API",
-    description="API for WhatSkills - Employability Prediction Platform",
-    version="1.0.0"
-)
+from src.controllers.user_controller import router as user_router
 
 # CORS middleware for frontend communication
 app.add_middleware(
