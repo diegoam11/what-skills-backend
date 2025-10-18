@@ -1,12 +1,18 @@
 ## Antes de hacer commit
 
-```bash
-# Ordenar imports
-isort .
+### Ordenar imports
 
-# Formatear el código
+```bash
+isort .
+```
+### Formatear el código
+```bash
+
 black .
+```
 
 ## Ejecutar programa
+
 ```bash
 uvicorn src.main:app --reload
+```
