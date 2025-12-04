@@ -1,3 +1,8 @@
+from typing import Optional, List
+from motor.motor_asyncio import AsyncIOMotorDatabase
+from ..models.user import UserCreate, UserResponse, EmployabilityData, EmployabilityScore, Recommendation
+from ..utils.auth import get_password_hash
+from datetime import datetime
 from bson import ObjectId
 
 from src.config.db import get_mongo_connection
