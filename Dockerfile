@@ -1,31 +1,24 @@
-# Usamos una versión ligera de Python 3.11
+# Usamos una imagen base ligera de Python (ajusta la versión si es necesario)
 FROM python:3.11-slim
 
-# Evita que Python genere archivos .pyc y guarda logs en tiempo real
+# Evita que Python genere archivos .pyc y asegura que los logs lleguen a Cloud Logging inmediatamente
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Directorio de trabajo dentro del contenedor
-WORKDIR /code
+WORKDIR /app
 
-# Instalamos dependencias del sistema necesarias para compilar algunas librerías
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends gcc python3-dev libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Copiamos primero los requirements para aprovechar la caché de Docker
+COPY requirements.txt .
 
-# Copiamos primero los requerimientos (para aprovechar la caché de Docker)
-COPY requirements.txt /code/
+# Instalamos las dependencias
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-# Instalamos las librerías de Python
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+# Copiamos el resto del código
+COPY . .
 
-# --- CORRECCIÓN IMPORTANTE ---
-# Antes copiabas "src", ahora copiamos "app"
-COPY ./app /code/app
+# Exponemos el puerto (Cloud Run inyecta la variable PORT, por defecto 8080)
+ENV PORT=8080
 
-# Usuario no-root por seguridad (opcional pero recomendado)
-# RUN adduser --disabled-password --gecos '' appuser && chown -R appuser:appuser /code
-# USER appuser
-
-# Comando para iniciar la app (apuntando a app.main)
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Comando de ejecución con Uvicorn
+# 'main:app' asume que tu archivo es main.py y la instancia de FastAPI es app
+CMD exec uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
