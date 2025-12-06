@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from app.core.database import init_db
+from app.core.database import init_db, create_initial_plans
 from app.core.config import settings
 # Importamos el servicio de IA para que se cargue el modelo al inicio
 from app.services.ai_service import ai_service 
@@ -12,6 +12,8 @@ from fastapi.middleware.cors import CORSMiddleware
 async def lifespan(app: FastAPI):
     print("🚀 Iniciando...")
     init_db()
+    #SEED AUTOMÁTICO
+    create_initial_plans()
     # Aquí podríamos hacer un "warm-up" de la IA si quisiéramos
     yield
     print("🛑 Apagando...")

@@ -41,12 +41,11 @@ async def analyze_profile(
     if not target:
         raise HTTPException(status_code=400, detail="Debes definir un Objetivo Profesional.")
 
-    # 1. Vectorizar objetivo (SIMPLE)
+    # 1. Vectorizar objetivo
+    enhanced_target = f"Ingeniería de software programación desarrollo técnico sistemas {target}"
+    
     try:
-        # Usamos el input del usuario tal cual.
-        # Mantenemos is_document=False solo porque E5 lo requiere técnicamente ("query: "), 
-        # pero no agregamos palabras extra.
-        query_vector = ai_service.generate_embedding(target, is_document=False)
+        query_vector = ai_service.generate_embedding(enhanced_target, is_document=False)
     except Exception as e:
         print(f"Error embedding: {e}")
         query_vector = [0.0] * 768 
@@ -62,22 +61,14 @@ async def analyze_profile(
     result_proxy = session.execute(query, params={"vector": str(query_vector)})
     raw_results = result_proxy.fetchall()
     
-    # --- FILTRO POR DISTANCIA (ÚNICO FILTRO) ---
-    # Ajustamos a 0.28 como acordamos.
-    # Si ves que sigue entrando "basura", bájalos a 0.26 o 0.25 poco a poco.
+    # --- FILTRO ---
     MAX_DISTANCE_THRESHOLD = 0.28
     
     valid_jobs = []
-    print(f"\n🔍 Analizando objetivo: '{target}'")
-    print("-" * 50)
     
     for row in raw_results:
-        # Solo miramos la distancia matemática
         if row.distance <= MAX_DISTANCE_THRESHOLD:
             valid_jobs.append(row)
-            print(f"   ✅ Aceptada: {row.title} ({row.distance:.4f})")
-        else:
-            print(f"   ❌ Descartada por distancia: {row.title} ({row.distance:.4f})")
 
     if not valid_jobs:
         return {
@@ -101,19 +92,29 @@ async def analyze_profile(
     skill_market_stats: Dict[str, Dict[str, Any]] = {}
     
     for link, skill in market_skills_rows:
-        if skill.name not in skill_market_stats:
-            skill_market_stats[skill.name] = {"count": 0, "levels": []}
+        # Usamos el nombre original para mostrar, pero la clave será LOWER para agrupar mejor
+        # (Aunque aquí confiamos en que la IA normalizó, pero por si acaso)
+        skill_name = skill.name
         
-        skill_market_stats[skill.name]["count"] += 1
-        skill_market_stats[skill.name]["levels"].append(link.level)
+        if skill_name not in skill_market_stats:
+            skill_market_stats[skill_name] = {"count": 0, "levels": []}
+        
+        skill_market_stats[skill_name]["count"] += 1
+        skill_market_stats[skill_name]["levels"].append(link.level)
 
-    # 4. Obtener Skills del Usuario
+    # 4. Obtener Skills del Usuario (MAPEO INSENSIBLE A MAYÚSCULAS)
     user_links = session.exec(select(UserSkillLink, Skill).where(
         UserSkillLink.user_id == current_user.id,
         UserSkillLink.skill_id == Skill.id
     )).all()
     
-    user_skills_map = {skill.name: link.level for link, skill in user_links}
+    # --- CORRECCIÓN CLAVE AQUÍ ---
+    # Guardamos las keys en minúsculas para facilitar la búsqueda
+    # Guardamos también el nombre "bonito" original para mostrarlo luego
+    user_skills_map = {
+        skill.name.lower(): {"level": link.level, "original_name": skill.name} 
+        for link, skill in user_links
+    }
     
     # 5. CALCULAR GAPS
     missing_skills = []
@@ -139,15 +140,22 @@ async def analyze_profile(
         levels = stats['levels']
         required_level = max(set(levels), key=levels.count)
         
-        if skill_name in user_skills_map:
+        # --- COMPARACIÓN INSENSIBLE A MAYÚSCULAS ---
+        name_lower = skill_name.lower()
+        
+        if name_lower in user_skills_map:
+            # ¡MATCH ENCONTRADO!
+            user_skill_data = user_skills_map[name_lower]
+            
             present_skills.append({
-                "name": skill_name,
-                "level": user_skills_map[skill_name]
+                "name": user_skill_data["original_name"], # Mostramos el nombre que tiene el usuario
+                "level": user_skill_data["level"]
             })
             user_matched_weight += weight 
         else:
+            # GAP REAL
             missing_skills.append({
-                "name": skill_name,
+                "name": skill_name, # Mostramos el nombre como lo pide el mercado
                 "level_required": required_level,
                 "frequency": stats['count'],
                 "reason": f"Aparece en {stats['count']} de {len(valid_jobs)} ofertas"
