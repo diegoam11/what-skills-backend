@@ -2,8 +2,6 @@ from typing import Optional, List, TYPE_CHECKING
 from datetime import datetime
 import uuid
 from sqlmodel import SQLModel, Field, Relationship
-
-# Importamos el Link Model directamente (este no causa ciclos)
 from app.models.link import UserSkillLink
 
 if TYPE_CHECKING:
@@ -22,6 +20,16 @@ class User(SQLModel, table=True):
     academic_level: Optional[str] = None
     
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    # CAMPOS DE SUSCRIPCIÓN
+    # Guardamos el código del plan (ej: 'TRIAL') para rápido acceso
+    plan_code: str = Field(default="TRIAL") 
+    
+    # Fecha de fin de suscripción (Null = nunca o expirado)
+    subscription_end: Optional[datetime] = None
+    
+    # Estado (active, expired, cancelled)
+    subscription_status: str = Field(default="active")
 
     # Relación: Un usuario tiene muchas skills
     # Usamos "Skill" (string)
