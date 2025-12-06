@@ -1,4 +1,5 @@
 import json
+import os
 from google import genai
 from google.genai import types
 from sentence_transformers import SentenceTransformer
@@ -7,14 +8,20 @@ from app.core.config import settings
 class AIService:
     def __init__(self):
         print("🤖 Inicializando Servicios de IA (Gemini 2.0 + Local)...")
-        
+
         # 1. Cliente Gemini Moderno
         self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
-        
+
         # 2. Modelo Local para Embeddings
-        # Esto descarga el modelo "intfloat/multilingual-e5-base" la primera vez
-        print(f"📥 Cargando modelo local: {settings.EMBEDDING_MODEL_NAME}...")
-        self.embedding_model = SentenceTransformer(settings.EMBEDDING_MODEL_NAME)
+        # Usar ruta local si existe (Docker), sino descargar de HuggingFace (local dev)
+        model_path = os.environ.get("MODEL_PATH", "/models/multilingual-e5-base")
+
+        if os.path.exists(model_path):
+            print(f"📥 Cargando modelo desde ruta local: {model_path}...")
+            self.embedding_model = SentenceTransformer(model_path)
+        else:
+            print(f"📥 Descargando modelo: {settings.EMBEDDING_MODEL_NAME}...")
+            self.embedding_model = SentenceTransformer(settings.EMBEDDING_MODEL_NAME)
         print("✅ IA lista.")
 
     def generate_embedding(self, text: str, is_document: bool = True) -> list[float]:

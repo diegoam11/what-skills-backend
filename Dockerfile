@@ -5,13 +5,8 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Directorio donde se cachearán los modelos de HuggingFace (fuera de /app para no ser sobrescrito)
-ENV HF_HOME=/models
-ENV SENTENCE_TRANSFORMERS_HOME=/models
-
-# MODO OFFLINE: Forzar a usar solo el cache local, sin consultar HuggingFace
-ENV HF_HUB_OFFLINE=1
-ENV TRANSFORMERS_OFFLINE=1
+# Ruta fija donde guardaremos el modelo
+ENV MODEL_PATH=/models/multilingual-e5-base
 
 WORKDIR /app
 
@@ -21,8 +16,8 @@ COPY requirements.txt .
 # Instalamos las dependencias
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-# PRE-DESCARGA del modelo de embeddings durante el build (en modo online)
-RUN HF_HUB_OFFLINE=0 python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-base')"
+# PRE-DESCARGA del modelo y guardarlo en ruta fija
+RUN python -c "from sentence_transformers import SentenceTransformer; model = SentenceTransformer('intfloat/multilingual-e5-base'); model.save('/models/multilingual-e5-base')"
 
 # Copiamos el resto del código
 COPY . .
