@@ -5,9 +5,9 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Directorio donde se cachearán los modelos de HuggingFace
-ENV HF_HOME=/app/.cache/huggingface
-ENV TRANSFORMERS_CACHE=/app/.cache/huggingface
+# Directorio donde se cachearán los modelos de HuggingFace (fuera de /app para no ser sobrescrito)
+ENV HF_HOME=/models
+ENV SENTENCE_TRANSFORMERS_HOME=/models
 
 WORKDIR /app
 
