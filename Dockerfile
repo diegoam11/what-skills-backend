@@ -21,4 +21,4 @@ ENV PORT=8080
 
 # Comando de ejecución con Uvicorn
 # 'main:app' asume que tu archivo es main.py y la instancia de FastAPI es app
-CMD exec uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
+CMD exec uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
