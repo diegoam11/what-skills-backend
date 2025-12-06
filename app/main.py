@@ -27,7 +27,8 @@ origins = [
     "http://localhost:5173",
     "http://localhost:3000"
     "https://what-skills-frontend.vercel.app",
-    "postgresql://whatskills-app-user:wsDb_231@34.30.7.184:5432/whatskills_db " 
+    "postgresql://whatskills-app-user:wsDb_231@34.30.7.184:5432/whatskills_db ",
+    "*" 
 ]
 
 app.add_middleware(
