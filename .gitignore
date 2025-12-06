@@ -5,7 +5,6 @@ venv/
 # Variables de entorno
 .env
 *.env
-.env.example
 
 # Compilados de Python
 __pycache__/
@@ -22,3 +21,5 @@ __pycache__/
 
 # macOS / Linux
 .DS_Store
+
+

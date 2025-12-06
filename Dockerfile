@@ -1,41 +1,31 @@
-# Use Python 3.11 slim image for production
+# Usamos una versión ligera de Python 3.11
 FROM python:3.11-slim
 
-# Set working directory
-WORKDIR /app
-
-# Set environment variables
+# Evita que Python genere archivos .pyc y guarda logs en tiempo real
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Install system dependencies
+# Directorio de trabajo dentro del contenedor
+WORKDIR /code
+
+# Instalamos dependencias del sistema necesarias para compilar algunas librerías
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        gcc \
-        python3-dev \
+    && apt-get install -y --no-install-recommends gcc python3-dev libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first to leverage Docker cache
-COPY requirements.txt .
+# Copiamos primero los requerimientos (para aprovechar la caché de Docker)
+COPY requirements.txt /code/
 
-# Install Python dependencies
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+# Instalamos las librerías de Python
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-# Copy source code
-COPY src/ ./src/
+# --- CORRECCIÓN IMPORTANTE ---
+# Antes copiabas "src", ahora copiamos "app"
+COPY ./app /code/app
 
-# Create non-root user for security
-RUN adduser --disabled-password --gecos '' appuser \
-    && chown -R appuser:appuser /app
-USER appuser
+# Usuario no-root por seguridad (opcional pero recomendado)
+# RUN adduser --disabled-password --gecos '' appuser && chown -R appuser:appuser /code
+# USER appuser
 
-# Expose port
-EXPOSE 8000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8000/health')" || exit 1
-
-# Start the application
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Comando para iniciar la app (apuntando a app.main)
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
