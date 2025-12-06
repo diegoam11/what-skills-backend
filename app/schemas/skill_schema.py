@@ -1,9 +1,14 @@
 from pydantic import BaseModel, Field
 from typing import List, Literal, Optional
 
+class ExtractedSkill(BaseModel):
+    name: str
+    # La IA intentará adivinar, si no sabe, por defecto Básico
+    proficiency: Literal["Básico", "Intermedio", "Avanzado"] = "Básico"
+
 class SkillsExtractionResponse(BaseModel):
-    habilidadesTecnicas: List[str]
-    habilidadesBlandas: List[str]
+    habilidadesTecnicas: List[ExtractedSkill]
+    habilidadesBlandas: List[ExtractedSkill]
 
 
 class SkillAddRequest(BaseModel):
