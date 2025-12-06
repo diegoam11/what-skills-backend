@@ -21,6 +21,8 @@ steps:
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
+      - '--memory'
+      - '2Gi'
       
       # --- CORRECCIÓN: Todo en una sola línea separada por comas ---
       - '--set-env-vars'

@@ -5,6 +5,10 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+# Directorio donde se cachearán los modelos de HuggingFace
+ENV HF_HOME=/app/.cache/huggingface
+ENV TRANSFORMERS_CACHE=/app/.cache/huggingface
+
 WORKDIR /app
 
 # Copiamos primero los requirements para aprovechar la caché de Docker
@@ -12,6 +16,9 @@ COPY requirements.txt .
 
 # Instalamos las dependencias
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
+
+# PRE-DESCARGA del modelo de embeddings durante el build (evita rate limiting en runtime)
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/multilingual-e5-base')"
 
 # Copiamos el resto del código
 COPY . .
