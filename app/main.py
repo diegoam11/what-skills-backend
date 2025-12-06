@@ -25,7 +25,9 @@ app = FastAPI(title="What Skills API", lifespan=lifespan)
 # Permitimos que el Frontend (Vite) hable con el Backend
 origins = [
     "http://localhost:5173",
-    "http://localhost:3000", # Por si acaso
+    "http://localhost:3000"
+    "https://what-skills-frontend.vercel.app",
+    "postgresql://whatskills-app-user:wsDb_231@34.30.7.184:5432/whatskills_db " 
 ]
 
 app.add_middleware(
